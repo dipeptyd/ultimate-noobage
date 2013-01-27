@@ -203,6 +203,7 @@ tree::tree(ifstream &file):root(NULL)
 
 void tree::noobtraverse(node *iter)
 {
+    //http://en.wikipedia.org/wiki/Tree_traversal#Depth-first_2
     cout << "name " << iter->name << endl;
     cout << "counter " << iter->counter << endl;
     if(iter->right)
