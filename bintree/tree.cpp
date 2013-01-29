@@ -1,38 +1,19 @@
-//  a b c d e f g h i j k l m n o p q r s t u v w x y z
-//
-// LoremipsumdolorsitametconsecteturadipiscingelitPhaselluselementumultricesmagnasedvulputatemiinterdumaMorbipulvinarquamsitamettristiqueporttitororciurnaconvallisligulaatgravidaodionibhsitametodioInsedurnaquismivariuspulvinarFuscemolestienuncerosidimperdietrisusDoneclectusauguesemperidmolestiefringillamolestieetpurusFusceornaretortorvitaenisiultricesvitaeultricesduiconsecteturSedateratorciMorbiporttitoramet
-//
-// 
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include "node.hpp"
 using namespace std;
+
+std::ostream& outlog = std::cout;
 const int buf_size = 255;
-struct node 
-{
-    node *left;
-    node *right;
-    unsigned counter;
-    char *name;
-    node(const char *str, unsigned counter=1):counter(counter),name(NULL),left(NULL),right(NULL)
-    {
-        this->name = new char[strlen(str)+1];
-        strcpy(name, str);
-    }
-    ~node()
-    {
-        delete[] name;
-    }
-
-
-};
 
 class tree
 {
     std::ifstream *file;
     void add_to_tree(const char *str);
-    void add_node_to_tree(const node *n);
-    void add_tree_to_tree(const tree &t);
+
+    void rotate_left(node *n);
+    void rotate_right(node *n);
 
     protected:
         node *root;
@@ -41,68 +22,166 @@ class tree
     ~tree();
     void tree_dest(node *iter);
 
-    tree(const tree &some_tree);
     tree(ifstream &file);
     tree();
-
     void noobtraverse(node *iter);
+    void print_tree(node *iter);
+    void print_tree();
     void load_file(ifstream &file);
+    void balance_branch(node *iter);
+    int branch_ratio(node *iter);
+    unsigned branch_size(node *iter, const bool &reset=false, const int &other_branch =-1);
+    int branch_height(node *iter);
+    unsigned branch_depth(node *iter);
+
 
 };
 
+
+unsigned tree::branch_depth(node *iter)
+{
+    if(iter)
+    return(1+branch_depth(iter->parent));
+    else
+        return -1;
+
+}
+
+void tree::print_tree()
+{
+    this->print_tree(this->root);
+}
+
+void tree::print_tree(node *n)
+{
+
+}
+
+void tree::rotate_left(node *n)
+{
+
+}
+void tree::rotate_right(node *n)
+{
+
+}
+int tree::branch_height(node *iter)
+{
+    if(iter)
+        return (max(branch_height(iter->left), branch_height(iter->right)+1));
+    else 
+        return -1;
+
+}
+
+int tree::branch_ratio(node *iter)
+{
+
+    int ratio = 0;
+    if(iter)
+    {
+        unsigned left = this->branch_height(iter->left);
+        unsigned right = this->branch_height(iter->right); //static doesn't 0 ? >:
+        ratio = (left-right);
+    }
+
+    return ratio;
+
+}
+
+unsigned tree::branch_size(node *iter, const bool &reset, const int &other_branch)
+{
+
+
+    static unsigned counter = 0;
+    if(reset)
+        counter = 0;
+    //outlog << " ohai counter is " << counter << std::endl;
+    if(iter)
+    {
+        ++counter;
+
+        if(other_branch != -1 and counter > other_branch)
+        {
+            return counter;
+        }
+
+            branch_size(iter->left, false, other_branch);
+            branch_size(iter->right, false, other_branch);
+    }
+
+
+    return counter;
+}
 
 tree::tree()
 {
 }
 
-tree::tree(const tree &some_tree)
-{
-    this->add_tree_to_tree(some_tree);
-}
 
-void tree::add_tree_to_tree(const tree &t)
+void tree::balance_branch(node *iter)
 {
-    node *foreign_iter = t.root;
-    if(foreign_iter)
+    if(iter)
     {
 
-    }
+    int ratio = this->branch_height(this->root);
 
+    outlog << "OHAI IM " << iter->name  << " AND MAI HAIT IS " << ratio << std::endl;
+    outlog << " MAI DePT IS " << this->branch_depth(iter) << std::endl;
+
+
+    //outlog << ratio << std::endl;  //below 0  - right branch larger
+
+        ////
+    //if(ratio == 2 or ratio == -2)
+    //{
+        //int child_ratio;
+        //if(ratio == 2)
+        //{
+
+            //outlog << "LEFT ROTATION " << std::endl;
+
+            //child_ratio = this->branch_ratio(iter->left);
+            //outlog << child_ratio;
+                //if(child_ratio>0)
+                //{
+                    //outlog << "LEFT LEFT ROTATION" << std::endl;
+                    //this->rotate_right(iter);
+
+                //}
+
+                //else if(child_ratio<0)
+                    //outlog <<"LEFT RIGHT ROTATION" << std::endl;
+                //else
+                    //outlog << "DUNNOLOL ROTATION" << std::endl;
+
+        //}
+        //if(ratio == -2)
+        //{
+            //outlog << "RIGHT ROTATION" << std::endl;
+
+            //child_ratio = this->branch_ratio(iter->right);
+            //outlog << child_ratio;
+                //if(child_ratio>0)
+                    //outlog << "RIGhT LEFT ROTATION" << std::endl;
+                //else if(child_ratio<0)
+                //{
+                    //outlog <<"RIGHT RIGHT ROTATION" << std::endl;
+                    //this->rotate_right(iter->right);
+                //}
+                //else
+                    //outlog << "DUNNOLOL ROTATION" << std::endl;
+        //}
+    //}
+    //else
+    //{
+            //outlog << "GOIN UP" << std::endl;
+            //this->balance_branch(iter->parent);
+    //}
+
+
+    //}
 }
-
-void tree::add_node_to_tree(const node *n)
-{
-    node *iter = root;
-
-    while(iter)
-    {
-        int str_cmp = strcmp(n->name, iter->name);
-        if(str_cmp==0)
-        {
-            iter->counter += n->counter;
-            return;
-        }
-        else if(str_cmp>0)
-        {
-            if(iter->left)
-                iter=iter->left;
-            else
-            {
-                iter->left = new node(n->name, n->counter);
-            }
-        }
-        else
-        {
-            if(iter->right)
-            {
-                iter=iter->right;
-            }
-            else
-            {
-                iter->right = new node(n->name,n->counter);
-            }
-        }
-    }
 }
 
 void tree::add_to_tree(const char *str)
@@ -125,6 +204,8 @@ void tree::add_to_tree(const char *str)
             else
             {
                 iter->left = new node(str);
+                iter->left->parent = iter; //TODO: node method instead?
+                this->balance_branch(iter->left);
                 return;
             }
         }
@@ -135,6 +216,8 @@ void tree::add_to_tree(const char *str)
             else
             {
                 iter->right = new node(str);
+                iter->right->parent = iter; //TODO: node method instead?
+                this->balance_branch(iter->right);
                 return;
             }
         }
@@ -192,6 +275,7 @@ void tree::load_file(ifstream &file)
 
     }
     this->noobtraverse(this->root);
+    outlog << " ratio " << this->branch_ratio(this->root) << std::endl;
     delete[] buffer;
 
 }
@@ -203,14 +287,18 @@ tree::tree(ifstream &file):root(NULL)
 
 void tree::noobtraverse(node *iter)
 {
-    //http://en.wikipedia.org/wiki/Tree_traversal#Depth-first_2
-    cout << "name " << iter->name << endl;
-    cout << "counter " << iter->counter << endl;
-    if(iter->right)
+    if(iter)
+    {
+    outlog << "name " << iter->name << endl;
+    outlog << "counter " << iter->counter << endl;
+    if(iter->parent)
+        outlog << "     parent name  " << iter->parent->name << endl;
+
         this->noobtraverse(iter->right);
-    if(iter->left)
         this->noobtraverse(iter->left);
+    }
 }
+
 
 
 class amount_sort_tree : public tree
@@ -225,7 +313,7 @@ void amount_sort_tree::add_node_to_tree(node *n)
 
 int main()
 {
-    std::ifstream file("tree.cpp");
+    std::ifstream file("testfile");
 
     if(file.good())
         tree f(file);
