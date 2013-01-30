@@ -4,7 +4,8 @@
 #include "node.hpp"
 using namespace std;
 
-std::ostream& outlog = std::cout;
+std::ofstream outlog("outlog");
+std::ostream& output = std::cout;
 const int buf_size = 255;
 
 class tree
@@ -33,10 +34,31 @@ class tree
     unsigned branch_size(node *iter, const bool &reset=false, const int &other_branch =-1);
     int branch_height(node *iter);
     unsigned branch_depth(node *iter);
+    void print_node(node *n);
 
 
 };
 
+
+
+void tree::print_node(node *n)
+{
+    if(n)
+    {
+    output << n << std::endl;
+    if(n->parent)
+        output << "parent:" << n->parent << std::endl;
+
+    output << "name  :" << n->name << std::endl;
+
+    if(n->left)
+        output << "left  :" << n->left->name << std::endl;
+    if(n->right)
+        output << "right :" << n->right->name << std::endl;
+    }
+
+
+}
 
 unsigned tree::branch_depth(node *iter)
 {
@@ -49,7 +71,7 @@ unsigned tree::branch_depth(node *iter)
 
 void tree::print_tree()
 {
-    this->print_tree(this->root);
+    this->noobtraverse(this->root);
 }
 
 void tree::print_tree(node *n)
@@ -57,12 +79,87 @@ void tree::print_tree(node *n)
 
 }
 
-void tree::rotate_left(node *n)
+void tree::rotate_left(node *n) // rotate_left because the n node goes to the left
 {
 
+    node *a, *b, *c, *par; // yes, i'm too stupid to do this right.
+
+    a = n;
+    b = n->right;
+    if(b)
+        c = b->right;
+    par = n->parent;
+
+
+    outlog << "=============================ROTATE_LEFT======================================" << std::endl;
+    outlog << "================================PRE===========================================" << std::endl;
+    outlog << "a " << a << std::endl << "  " <<  a->parent << " " << a->left << " " << a->right << std::endl;
+    outlog << "b " << b << std::endl << "  " <<  b->parent << " " << b->left << " " << b->right << std::endl;
+    if(c)
+        outlog << "c " << c << std::endl << "  " <<  c->parent << " " << c->left << " " << c->right << std::endl;
+    outlog << "==============================================================================" << std::endl;
+    if(par)
+        if(par->left == a)
+            par->left = b;
+        else
+            par->right = b;
+    else
+        this->root=b;
+
+    b->parent = par;
+
+    a->right = b->left;
+    b->left = a;
+    a->parent = b;
+
+
+    outlog << "===============================POST===========================================" << std::endl;
+    outlog << "a " << a << std::endl << "  " <<  a->parent << " " << a->left << " " << a->right << std::endl;
+    outlog << "b " << b << std::endl << "  " <<  b->parent << " " << b->left << " " << b->right << std::endl;
+    if(c)
+        outlog << "c " << c << std::endl << "  " <<  c->parent << " " << c->left << " " << c->right << std::endl;
+    outlog << "==============================================================================" << std::endl;
 }
 void tree::rotate_right(node *n)
 {
+
+    node *a, *b, *c, *par; // yes, i'm too stupid to do this right.
+
+    a = n;
+    b = n->left;
+    if(b)
+        c = b->left;
+
+    par = n->parent;
+
+    outlog << "=============================ROTATE_RIGHT=====================================" << std::endl;
+    outlog << "================================PRE===========================================" << std::endl;
+    outlog << "a " << a << std::endl << "  " <<  a->parent << " " << a->left << " " << a->right << std::endl;
+    outlog << "b " << b << std::endl << "  " <<  b->parent << " " << b->left << " " << b->right << std::endl;
+    if(c)
+        outlog << "c " << c << std::endl << "  " <<  c->parent << " " << c->left << " " << c->right << std::endl;
+    outlog << "==============================================================================" << std::endl;
+
+    if(par)
+        if(par->left == a)
+            par->left = b;
+        else
+            par->right = b;
+    else
+        this->root = b;
+    b->parent = par;
+
+    a->left = b->right;
+    b->right = a;
+    a->parent = b;
+
+
+    outlog << "===============================POST===========================================" << std::endl;
+    outlog << "a " << a << std::endl << "  " <<  a->parent << " " << a->left << " " << a->right << std::endl;
+    outlog << "b " << b << std::endl << "  " <<  b->parent << " " << b->left << " " << b->right << std::endl;
+    if(c)
+        outlog << "c " << c << std::endl << "  " <<  c->parent << " " << c->left << " " << c->right << std::endl;
+    outlog << "==============================================================================" << std::endl;
 
 }
 int tree::branch_height(node *iter)
@@ -124,73 +221,98 @@ void tree::balance_branch(node *iter)
     if(iter)
     {
 
-    int ratio = this->branch_height(this->root);
+    int ratio = this->branch_ratio(iter);
 
-    outlog << "OHAI IM " << iter->name  << " AND MAI HAIT IS " << ratio << std::endl;
-    outlog << " MAI DePT IS " << this->branch_depth(iter) << std::endl;
-
-
-    //outlog << ratio << std::endl;  //below 0  - right branch larger
+    outlog << ratio << std::endl;  //below 0  - right branch larger
 
         ////
-    //if(ratio == 2 or ratio == -2)
-    //{
-        //int child_ratio;
-        //if(ratio == 2)
-        //{
+    if(ratio == 2 or ratio == -2)
+    {
 
-            //outlog << "LEFT ROTATION " << std::endl;
+                //output << "====================================================================" <<std::endl;
+                //this->print_tree();
+        int child_ratio;
+        if(ratio == 2)
+        {
 
-            //child_ratio = this->branch_ratio(iter->left);
-            //outlog << child_ratio;
-                //if(child_ratio>0)
-                //{
-                    //outlog << "LEFT LEFT ROTATION" << std::endl;
-                    //this->rotate_right(iter);
+            outlog << "LEFT " << std::endl;
 
-                //}
+            child_ratio = this->branch_ratio(iter->left);
+            outlog << child_ratio;
+                if(child_ratio>0)
+                {
+                    outlog << "LEFT LEFT" << std::endl;
+                    this->rotate_right(iter);
 
-                //else if(child_ratio<0)
-                    //outlog <<"LEFT RIGHT ROTATION" << std::endl;
-                //else
-                    //outlog << "DUNNOLOL ROTATION" << std::endl;
+                }
 
-        //}
-        //if(ratio == -2)
-        //{
-            //outlog << "RIGHT ROTATION" << std::endl;
+                else if(child_ratio<0)
+                {
+                    outlog <<"LEFT RIGHT ROTATION" << std::endl;
 
-            //child_ratio = this->branch_ratio(iter->right);
-            //outlog << child_ratio;
-                //if(child_ratio>0)
-                    //outlog << "RIGhT LEFT ROTATION" << std::endl;
-                //else if(child_ratio<0)
-                //{
-                    //outlog <<"RIGHT RIGHT ROTATION" << std::endl;
-                    //this->rotate_right(iter->right);
-                //}
-                //else
-                    //outlog << "DUNNOLOL ROTATION" << std::endl;
-        //}
-    //}
-    //else
-    //{
-            //outlog << "GOIN UP" << std::endl;
-            //this->balance_branch(iter->parent);
-    //}
+                    this->rotate_left(iter->left);
+                    this->rotate_right(iter);
+                }
+                else
+                {
+                    outlog << "DUNNOLOL ROTATION" << std::endl;
+                }
+
+        }
+        if(ratio == -2)
+        {
+            outlog << "RIGHT ROTATION" << std::endl;
+
+            child_ratio = this->branch_ratio(iter->right);
+            outlog << child_ratio;
+                if(child_ratio>0)
+                {
+                    outlog << "RIGhT LEFT ROTATION" << std::endl;
+                    this->rotate_right(iter->right);
+                    this->rotate_left(iter);
+                }
+                else if(child_ratio<0)
+                {
+                    outlog <<"RIGHT RIGHT ROTATION" << std::endl;
+                    this->rotate_left(iter);
+                }
+                else
+                    outlog << "DUNNOLOL ROTATION" << std::endl;
+        }
+
+                //output << "====================================================================" <<std::endl;
+                //this->print_tree();
+    }
+    else
+    {
+            outlog << "GOIN UP" << std::endl;
+            this->balance_branch(iter->parent);
+    }
 
 
-    //}
-}
+    }
 }
 
 void tree::add_to_tree(const char *str)
 {
+    
+    bool borked = false;
+
+    if(strcmp(str, "sagittis")==0)
+           {
+
+               borked = true;
+               cout << "======================================" << std::endl;
+
+           }
     short str_cmp;
     node *iter = root;
     while(iter)
     {
         str_cmp = strcmp(str,iter->name);
+
+        if(borked)
+            print_node(iter);
 
         if(str_cmp==0)
         {
@@ -205,7 +327,9 @@ void tree::add_to_tree(const char *str)
             {
                 iter->left = new node(str);
                 iter->left->parent = iter; //TODO: node method instead?
-                this->balance_branch(iter->left);
+                if(borked)
+                    output <<  " ADD TO RIGHT" << std::endl;
+                this->balance_branch(iter);
                 return;
             }
         }
@@ -217,7 +341,9 @@ void tree::add_to_tree(const char *str)
             {
                 iter->right = new node(str);
                 iter->right->parent = iter; //TODO: node method instead?
-                this->balance_branch(iter->right);
+                if(borked)
+                    output <<" ADD TO RIGHT" << std::endl;
+                this->balance_branch(iter);
                 return;
             }
         }
@@ -289,12 +415,12 @@ void tree::noobtraverse(node *iter)
 {
     if(iter)
     {
-    outlog << "name " << iter->name << endl;
-    outlog << "counter " << iter->counter << endl;
-    if(iter->parent)
-        outlog << "     parent name  " << iter->parent->name << endl;
-
         this->noobtraverse(iter->right);
+        output << this->branch_depth(iter) << " :" << "(" << iter->name << ")";
+            if(iter->parent)
+                output << "[" <<  iter->parent->name << "]" << std::endl;
+            else
+                output << std::endl;
         this->noobtraverse(iter->left);
     }
 }
